@@ -1,5 +1,5 @@
-const DEFAULT_BASE = "http://127.0.0.1:8000";
-
+const DEFAULT_BASE = "https://back-speedtest.vercel.app";
+/**const DEFAULT_BASE = "http://127.0.0.1:8000"; */
 export function getApiBase(): string {
   if (typeof window === "undefined") return DEFAULT_BASE;
   const raw = process.env.NEXT_PUBLIC_API_BASE?.trim();
