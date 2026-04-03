@@ -31,7 +31,7 @@ export function LegalPageShell({ title, children }: Props) {
             sistemas@factosysperu.com
           </a>
           {" · "}
-          <a href="mailto:info@factosysperu.com" className="hover:text-slate-400">
+          <a href="mailto:soport@speedy.factosysperu.com" className="hover:text-slate-400">
             info@factosysperu.com
           </a>
         </p>
