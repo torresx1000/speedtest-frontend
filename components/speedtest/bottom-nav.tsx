@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 
-export type SpeedTestTab = "speed" | "results" | "map" | "settings";
+export type SpeedTestTab = "speed" | "results" | "terms";
 
 type Props = {
   active: SpeedTestTab;
@@ -40,13 +40,12 @@ export function BottomNav({ active, onChange }: Props) {
         <ListIcon />
         Resultados
       </Item>
-      <Item id="map">
-        <PinIcon />
-        Mapa
-      </Item>
-      <Item id="settings">
-        <GearIcon />
-        Ajustes
+      <Item id="terms">
+        <DocumentIcon />
+        <span className="flex flex-col items-center leading-[1.15] text-center">
+          <span>Términos</span>
+          <span className="max-w-[5.5rem] text-[8px] font-normal text-current opacity-90">y descripción de uso</span>
+        </span>
       </Item>
     </nav>
   );
@@ -69,26 +68,11 @@ function ListIcon() {
   );
 }
 
-function PinIcon() {
+function DocumentIcon() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <path d="M12 21s7-4.5 7-11a7 7 0 1 0-14 0c0 6.5 7 11 7 11Z" strokeLinejoin="round" />
-      <circle cx="12" cy="10" r="2.5" />
-    </svg>
-  );
-}
-
-function GearIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <path
-        d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c0 .66.39 1.26 1 1.51H21a2 2 0 1 1 0 4h-.09c-.66 0-1.26.39-1.51 1Z"
-        strokeLinejoin="round"
-      />
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" strokeLinejoin="round" />
+      <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

@@ -1,5 +1,7 @@
+import type { ActiveAdsResponse } from "./ads-types";
+
 const DEFAULT_BASE = "https://back-speedtest.vercel.app";
-/**const DEFAULT_BASE = "http://127.0.0.1:8000"; */
+/*const DEFAULT_BASE = "http://127.0.0.1:8000"; */
 export function getApiBase(): string {
   if (typeof window === "undefined") return DEFAULT_BASE;
   const raw = process.env.NEXT_PUBLIC_API_BASE?.trim();
@@ -118,4 +120,12 @@ export function measureUpload(
     xhr.onerror = () => reject(new Error("Error de red en subida"));
     xhr.send(buf);
   });
+}
+
+/** Anuncios activos por lateral (GET /ads/active). Usar cuando SHOW_ADS y ENABLE_ADS estén activos. */
+export async function fetchActiveAds(): Promise<ActiveAdsResponse> {
+  const base = getApiBase();
+  const res = await fetch(`${base}/ads/active`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Anuncios (${res.status})`);
+  return res.json() as Promise<ActiveAdsResponse>;
 }

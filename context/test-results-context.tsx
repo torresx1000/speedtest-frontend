@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 
-const STORAGE_KEY = "vi-speedtest-results";
+const STORAGE_KEY = "vi-speedyfactosys-results";
 const WINDOW_MS = 5 * 60 * 1000;
 
 export type SpeedTestRecord = {

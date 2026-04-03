@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Speedtest · Velocidad Internet",
-  description: "Medición de ping, bajada y subida contra tu API local",
+  title: "SpeedyFactosys · Velocidad Internet",
+  description: "Medición de ping, bajada y subida con SpeedyFactosys (Factosys Peru SAC)",
 };
 
 export default function RootLayout({

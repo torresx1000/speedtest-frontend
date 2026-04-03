@@ -6,11 +6,13 @@ import {
   measureDownload,
   measurePing,
   measureUpload,
+  // fetchActiveAds,
 } from "@/lib/speedtest-api";
+// import type { ActiveAdsResponse } from "@/lib/ads-types";
 import { BottomNav, type SpeedTestTab } from "@/components/speedtest/bottom-nav";
+import { AdBanner } from "@/components/speedtest/ad-banner";
 import { ResultsPanel } from "@/components/speedtest/results-panel";
-import { ServerMapPanel } from "@/components/speedtest/server-map-panel";
-import { SettingsPanel } from "@/components/speedtest/settings-panel";
+import { TermsUsagePanel } from "@/components/speedtest/terms-usage-panel";
 import { SpeedGauge } from "@/components/speedtest/speed-gauge";
 import { WaveDivider } from "@/components/speedtest/wave-divider";
 import { useTestResults } from "@/context/test-results-context";
@@ -19,6 +21,9 @@ type Phase = "idle" | "ping" | "download" | "upload" | "done";
 
 const DOWNLOAD_MB = 6;
 const UPLOAD_BYTES = 2 * 1024 * 1024;
+
+/** Reserva columnas laterales y monta AdBanner. Requiere ENABLE_ADS en lib/ads-config.ts para ver contenido. */
+const SHOW_ADS = false; // Cambiar a true para activar
 
 function formatMbps(v: number | null): string {
   if (v === null) return "—";
@@ -33,6 +38,15 @@ function formatMs(v: number | null): string {
 
 export function SpeedTestApp() {
   const { addResult } = useTestResults();
+  // const [activeAds, setActiveAds] = useState<ActiveAdsResponse | null>(null);
+
+  // TODO: Activar cuando el módulo de monetización esté listo.
+  // useEffect(() => {
+  //   void fetchActiveAds().then(setActiveAds).catch(() => {
+  //     setActiveAds(null);
+  //   });
+  // }, []);
+
   const [activeTab, setActiveTab] = useState<SpeedTestTab>("speed");
   const [phase, setPhase] = useState<Phase>("idle");
   const [running, setRunning] = useState(false);
@@ -123,7 +137,7 @@ export function SpeedTestApp() {
     const text = lines.join("\n");
     try {
       if (navigator.share) {
-        await navigator.share({ title: "Speedtest", text });
+        await navigator.share({ title: "SpeedyFactosys", text });
       } else {
         await navigator.clipboard.writeText(text);
       }
@@ -146,7 +160,9 @@ export function SpeedTestApp() {
         >
           ✕
         </button>
-        <span className="text-sm font-bold tracking-[0.2em] text-white">SPEEDTEST</span>
+        <span className="max-w-[min(100%,11rem)] truncate text-center text-xs font-bold tracking-wide text-white sm:max-w-none sm:text-sm sm:tracking-[0.12em]">
+          SpeedyFactosys
+        </span>
         {activeTab === "speed" ? (
           <button
             type="button"
@@ -192,40 +208,73 @@ export function SpeedTestApp() {
             <WaveDivider />
           </div>
 
-          <div className="relative mt-2 flex flex-1 flex-col items-center px-4 pb-6">
-            {error && (
-              <p className="mb-3 max-w-sm rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-center text-sm text-amber-100">
-                {error}
-                <span className="mt-1 block text-xs text-amber-200/80">
-                  ¿Está el backend en marcha? ({getApiBase()})
-                </span>
-              </p>
-            )}
+          <div
+            className={`relative mt-2 flex flex-1 flex-col px-4 pb-6 ${SHOW_ADS ? "" : "items-center"}`}
+          >
+            <div
+              className={
+                SHOW_ADS
+                  ? "mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 md:grid md:grid-cols-[minmax(72px,1fr)_minmax(0,320px)_minmax(72px,1fr)] md:items-start md:gap-3 lg:gap-4"
+                  : "flex w-full flex-1 flex-col items-center"
+              }
+            >
+              {SHOW_ADS && (
+                <div className="hidden md:flex md:order-1 md:justify-end md:pt-2">
+                  {/* Tras activar fetch: ad={activeAds?.lateral_izquierdo ?? undefined} */}
+                  <AdBanner posicion="lateral-izquierdo" />
+                </div>
+              )}
 
-            {showGaugeActive ? (
-              <div className="mt-2 w-full">
-                <SpeedGauge liveMbps={liveMbps} phase={phase} accent={gaugeAccent} />
+              <div className="order-1 flex min-w-0 flex-col items-center md:order-2">
+                {error && (
+                  <p className="mb-3 max-w-sm rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-center text-sm text-amber-100">
+                    {error}
+                    <span className="mt-1 block text-xs text-amber-200/80">
+                      ¿Está el backend en marcha? ({getApiBase()})
+                    </span>
+                  </p>
+                )}
+
+                {showGaugeActive ? (
+                  <div className="mt-2 w-full">
+                    <SpeedGauge liveMbps={liveMbps} phase={phase} accent={gaugeAccent} />
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={runTest}
+                    disabled={running}
+                    className="mt-10 flex h-44 w-44 shrink-0 items-center justify-center rounded-full border-[3px] border-amber-400/90 bg-[#0d1528] text-5xl font-black tracking-tight text-amber-400 shadow-[0_0_40px_rgba(250,204,21,0.12)] transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+                  >
+                    GO
+                  </button>
+                )}
+
+                {showGaugeActive && !running && phase === "done" && (
+                  <button
+                    type="button"
+                    onClick={runTest}
+                    className="mt-4 rounded-full border border-teal-500/40 bg-teal-500/10 px-6 py-2 text-sm font-semibold text-teal-300 transition-colors hover:bg-teal-500/20"
+                  >
+                    Probar de nuevo
+                  </button>
+                )}
               </div>
-            ) : (
-              <button
-                type="button"
-                onClick={runTest}
-                disabled={running}
-                className="mt-10 flex h-44 w-44 shrink-0 items-center justify-center rounded-full border-[3px] border-amber-400/90 bg-[#0d1528] text-5xl font-black tracking-tight text-amber-400 shadow-[0_0_40px_rgba(250,204,21,0.12)] transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
-              >
-                GO
-              </button>
-            )}
 
-            {showGaugeActive && !running && phase === "done" && (
-              <button
-                type="button"
-                onClick={runTest}
-                className="mt-4 rounded-full border border-teal-500/40 bg-teal-500/10 px-6 py-2 text-sm font-semibold text-teal-300 transition-colors hover:bg-teal-500/20"
-              >
-                Probar de nuevo
-              </button>
-            )}
+              {SHOW_ADS && (
+                <div className="hidden md:flex md:order-3 md:justify-start md:pt-2">
+                  {/* Tras activar fetch: ad={activeAds?.lateral_derecho ?? undefined} */}
+                  <AdBanner posicion="lateral-derecho" />
+                </div>
+              )}
+
+              {SHOW_ADS && (
+                <div className="order-2 flex w-full max-w-md flex-col gap-3 self-center border-t border-white/5 pt-4 md:hidden">
+                  <AdBanner posicion="lateral-izquierdo" />
+                  <AdBanner posicion="lateral-derecho" />
+                </div>
+              )}
+            </div>
 
             <div className="mt-auto w-full max-w-sm pt-8">
               <p className="text-center text-[11px] font-semibold uppercase tracking-wider text-slate-500">
@@ -263,17 +312,12 @@ export function SpeedTestApp() {
         </div>
       )}
 
-      {activeTab === "map" && (
+      {activeTab === "terms" && (
         <div className="flex min-h-0 flex-1 flex-col pt-4">
-          <h2 className="px-4 text-center text-[11px] font-bold tracking-[0.25em] text-slate-500">MAPA DEL SERVIDOR</h2>
-          <ServerMapPanel />
-        </div>
-      )}
-
-      {activeTab === "settings" && (
-        <div className="flex min-h-0 flex-1 flex-col pt-4">
-          <h2 className="px-4 text-center text-[11px] font-bold tracking-[0.25em] text-slate-500">AJUSTES</h2>
-          <SettingsPanel />
+          <h2 className="px-4 text-center text-[10px] font-bold leading-snug tracking-[0.2em] text-slate-500 sm:text-[11px] sm:tracking-[0.25em]">
+            TÉRMINOS Y DESCRIPCIÓN DE USO
+          </h2>
+          <TermsUsagePanel />
         </div>
       )}
 
